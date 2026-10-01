@@ -850,6 +850,7 @@ import org.jtaccuino.gog.theme.ThemeConfigurator;
         }
         String bare = Aes.statColumn(zCol);
         boolean raw = !descriptor.extractor().getColumn(df, bare).isEmpty();
+        var zType = raw ? descriptor.extractor().columnType(df, bare) : DataExtractor.ColumnType.NUMBER;
         MinMax zMinMax = raw ? descriptor.extractor().getMinMax(df, bare) : scales().numericRange(bare);
         if (zMinMax == null) {
             zMinMax = MinMax.UNIT;
@@ -893,12 +894,17 @@ import org.jtaccuino.gog.theme.ThemeConfigurator;
         if (yDiscrete && yCats != null) {
             coord3d.setYCategories(yCats);
         }
-        if (raw && descriptor.extractor().columnType(df, bare) != DataExtractor.ColumnType.NUMBER) {
+        // Only a genuine text column is categorical: a date or timestamp z axis
+        // stays continuous and breaks in calendar terms.
+        if (raw && zType == DataExtractor.ColumnType.TEXT) {
             var zCats = descriptor.extractor().getColumn(df, bare).stream()
                     .filter(Objects::nonNull)
                     .collect(Collectors.toCollection(LinkedHashSet::new));
             coord3d.setZCategories(new ArrayList<>(zCats));
         }
+        coord3d.setXColumnType(axisColumnType(descriptor.aes().x()));
+        coord3d.setYColumnType(axisColumnType(descriptor.aes().y()));
+        coord3d.setZColumnType(zType);
         coord3d.xLabel(descriptor.aes().x() != null ? descriptor.aes().x() : "x");
         coord3d.yLabel(descriptor.aes().y() != null ? descriptor.aes().y() : "y");
         coord3d.zLabel(bare);
@@ -912,6 +918,21 @@ import org.jtaccuino.gog.theme.ThemeConfigurator;
         coord3d.setPanelBounds(innerXMin, innerYMax, innerXMax - innerXMin, innerYMin - innerYMax);
         coord3d.setCanvasBounds(0, 0, canvasW, canvasH);
         coord3d.renderBackground(gc);
+    }
+
+    /**
+     * The column type of a 3D axis aesthetic: the extractor's classification for
+     * a raw column, or {@link DataExtractor.ColumnType#NUMBER} for a
+     * computed/stat column (which is numeric) or an unmapped axis.
+     *
+     * @param column the aesthetic column name, may be {@code null}
+     * @return the resolved column type
+     */
+    private DataExtractor.ColumnType axisColumnType(String column) {
+        if (column == null || scales().isStatColumn(column)) {
+            return DataExtractor.ColumnType.NUMBER;
+        }
+        return descriptor.extractor().columnType(descriptor.data(), column);
     }
 
     /**

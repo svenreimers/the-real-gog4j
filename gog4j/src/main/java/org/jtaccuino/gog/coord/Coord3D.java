@@ -30,10 +30,12 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
 import org.jtaccuino.gog.MinMax;
+import org.jtaccuino.gog.data.Temporals;
 import org.jtaccuino.gog.data.Values;
 import org.jtaccuino.gog.geometry.PolygonMath;
 import org.jtaccuino.gog.render.DrawSurface;
 import org.jtaccuino.gog.scale.Scale;
+import org.jtaccuino.gog.spi.DataExtractor;
 import org.jtaccuino.gog.theme.AxisStyle;
 import org.jtaccuino.gog.theme.CubeStyle;
 import org.jtaccuino.gog.theme.Theme;
@@ -86,6 +88,11 @@ public class Coord3D implements Coord {
     private double canvasX, canvasY, canvasW, canvasH;
 
     private double minDataX, maxDataX, minDataY, maxDataY, minDataZ, maxDataZ;
+    // The column type per axis, so a DATE/TIMESTAMP axis breaks and labels in
+    // calendar terms instead of printing raw epoch numbers.
+    private DataExtractor.ColumnType xColumnType = DataExtractor.ColumnType.NUMBER;
+    private DataExtractor.ColumnType yColumnType = DataExtractor.ColumnType.NUMBER;
+    private DataExtractor.ColumnType zColumnType = DataExtractor.ColumnType.NUMBER;
     private List<Double> zBreaks;
     private List<String> zLabels;
     private boolean zIsCategorical;
@@ -337,6 +344,36 @@ public class Coord3D implements Coord {
             zBoundsFromCategories();
         }
         projectionDirty = true;
+    }
+
+    /**
+     * Sets the column type of the x-axis, so a {@code DATE} or {@code TIMESTAMP}
+     * axis breaks and labels in calendar terms.
+     *
+     * @param type the x column type
+     */
+    public void setXColumnType(DataExtractor.ColumnType type) {
+        this.xColumnType = type == null ? DataExtractor.ColumnType.NUMBER : type;
+    }
+
+    /**
+     * Sets the column type of the y-axis, so a {@code DATE} or {@code TIMESTAMP}
+     * axis breaks and labels in calendar terms.
+     *
+     * @param type the y column type
+     */
+    public void setYColumnType(DataExtractor.ColumnType type) {
+        this.yColumnType = type == null ? DataExtractor.ColumnType.NUMBER : type;
+    }
+
+    /**
+     * Sets the column type of the z-axis, so a {@code DATE} or {@code TIMESTAMP}
+     * axis breaks and labels in calendar terms.
+     *
+     * @param type the z column type
+     */
+    public void setZColumnType(DataExtractor.ColumnType type) {
+        this.zColumnType = type == null ? DataExtractor.ColumnType.NUMBER : type;
     }
 
     /** Sets custom tick positions for the z-axis.
@@ -1158,8 +1195,10 @@ public class Coord3D implements Coord {
         // standard coordinate of a break is -0.5 + ts, exactly where the ticks
         // place their mark, so a face gridline always runs through the matching
         // tick on the edge. (zBreakTs() already handles the categorical z case.)
-        double[][] breaks = {breakValues(minDataX, maxDataX), breakValues(minDataY, maxDataY), zBreakValues()};
-        double[][] ts = {breakTs(minDataX, maxDataX), breakTs(minDataY, maxDataY), zBreakTs()};
+        double[][] breaks = {breakValues(minDataX, maxDataX, xColumnType),
+                             breakValues(minDataY, maxDataY, yColumnType), zBreakValues()};
+        double[][] ts = {breakTs(minDataX, maxDataX, xColumnType),
+                         breakTs(minDataY, maxDataY, yColumnType), zBreakTs()};
         for (CubeFace cubeFace : faces) {
             int face = cubeFace.ordinal();
             int axis = face / 2;
@@ -1232,6 +1271,32 @@ public class Coord3D implements Coord {
         return null;
     }
 
+    /**
+     * The label for a temporal axis break: a year on a {@code DATE} axis, a date
+     * or date-time on a {@code TIMESTAMP} axis, or {@code null} on a numeric axis
+     * so the caller falls back to {@link #formatBreak(double)}.
+     *
+     * @param axis  the axis index (0 = x, 1 = y, 2 = z)
+     * @param value the break value in data units
+     * @return the formatted label, or {@code null} when the axis is not temporal
+     */
+    private String temporalLabel(int axis, double value) {
+        var type = switch (axis) {
+            case 0 -> xColumnType;
+            case 1 -> yColumnType;
+            default -> zColumnType;
+        };
+        if (type == DataExtractor.ColumnType.DATE) {
+            return Temporals.dateLabel(value);
+        }
+        if (type == DataExtractor.ColumnType.TIMESTAMP) {
+            double min = axis == 0 ? minDataX : axis == 1 ? minDataY : minDataZ;
+            double max = axis == 0 ? maxDataX : axis == 1 ? maxDataY : maxDataZ;
+            return Temporals.timestampLabel(value, Temporals.granularityOf(min, max, 6));
+        }
+        return null;
+    }
+
     /** Tick positions for an axis: plain ordinals {@code 0..N-1} for a
      * categorical axis (one tick centred under each band), pretty breaks
      * otherwise. */
@@ -1243,9 +1308,9 @@ public class Coord3D implements Coord {
             return b;
         }
         return switch (axis) {
-            case 0 -> breakValues(minDataX, maxDataX);
-            case 1 -> breakValues(minDataY, maxDataY);
-            default -> breakValues(minDataZ, maxDataZ);
+            case 0 -> breakValues(minDataX, maxDataX, xColumnType);
+            case 1 -> breakValues(minDataY, maxDataY, yColumnType);
+            default -> breakValues(minDataZ, maxDataZ, zColumnType);
         };
     }
 
@@ -1261,9 +1326,9 @@ public class Coord3D implements Coord {
             return ts;
         }
         return switch (axis) {
-            case 0 -> breakTs(minDataX, maxDataX);
-            case 1 -> breakTs(minDataY, maxDataY);
-            default -> breakTs(minDataZ, maxDataZ);
+            case 0 -> breakTs(minDataX, maxDataX, xColumnType);
+            case 1 -> breakTs(minDataY, maxDataY, yColumnType);
+            default -> breakTs(minDataZ, maxDataZ, zColumnType);
         };
     }
 
@@ -1279,11 +1344,34 @@ public class Coord3D implements Coord {
             for (int i = 0; i < n; i++) b[i] = i;
             return b;
         }
-        return breakValues(minDataZ, maxDataZ);
+        return breakValues(minDataZ, maxDataZ, zColumnType);
     }
 
-    private static double[] breakValues(double min, double max) {
+    /**
+     * The tick positions for one continuous axis: calendar breaks for a
+     * {@code DATE}/{@code TIMESTAMP} axis, otherwise the "pretty" numeric breaks.
+     *
+     * @param min  the axis minimum
+     * @param max  the axis maximum
+     * @param type the axis column type
+     * @return the break values inside the range
+     */
+    private static double[] breakValues(double min, double max, DataExtractor.ColumnType type) {
+        if (type == DataExtractor.ColumnType.DATE) {
+            return toArray(Temporals.dateTicks(min, max));
+        }
+        if (type == DataExtractor.ColumnType.TIMESTAMP) {
+            return toArray(Temporals.timestampTicks(min, max, 6));
+        }
         return breaksWithin(min, max, prettyBreaks(min, max, 6));
+    }
+
+    private static double[] toArray(List<Double> values) {
+        double[] out = new double[values.size()];
+        for (int i = 0; i < out.length; i++) {
+            out[i] = values.get(i);
+        }
+        return out;
     }
 
     private double[] zBreakTs() {
@@ -1302,14 +1390,15 @@ public class Coord3D implements Coord {
             for (int i = 0; i < n; i++) ts[i] = (i + 0.5) / n;
             return ts;
         }
-        return breakTs(minDataZ, maxDataZ);
+        return breakTs(minDataZ, maxDataZ, zColumnType);
     }
 
-    private static double[] breakTs(double min, double max) {
-        double[] breaks = breaksWithin(min, max, prettyBreaks(min, max, 6));
+    private static double[] breakTs(double min, double max, DataExtractor.ColumnType type) {
+        double[] breaks = breakValues(min, max, type);
         double[] ts = new double[breaks.length];
+        double span = max - min;
         for (int i = 0; i < breaks.length; i++) {
-            ts[i] = (breaks[i] - min) / (max - min);
+            ts[i] = span == 0 ? 0 : (breaks[i] - min) / span;
         }
         return ts;
     }
@@ -1876,6 +1965,7 @@ public class Coord3D implements Coord {
 
             String label = axis == 2 ? customZLabel(values[bi]) : null;
             if (label == null) label = categoryLabel(axis, values[bi]);
+            if (label == null) label = temporalLabel(axis, values[bi]);
             if (label == null) label = formatBreak(values[bi]);
             if (label.isEmpty()) continue;
             _meas.setText(label);

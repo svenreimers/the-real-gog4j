@@ -70,6 +70,7 @@ import org.jtaccuino.gog.examples.dflib.PolarRadarPlots;
 import org.jtaccuino.gog.examples.dflib.PolarRadialPlots;
 import org.jtaccuino.gog.examples.dflib.ScalePlots;
 import org.jtaccuino.gog.examples.dflib.SeattleWeatherPlots;
+import org.jtaccuino.gog.examples.dflib.SeattleWeatherPlots3d;
 import org.jtaccuino.gog.examples.dflib.StatPlots;
 import org.jtaccuino.gog.examples.dflib.SummaryStatPlots;
 import org.jtaccuino.gog.examples.dflib.Surface3dPlots;
@@ -351,6 +352,8 @@ public class PlotExporter {
                 "timestamp", "A timestamp column on the y axis — the same break ladder under `coordFlip()`"));
         plots.put("seattle-weather-04-area", new Figure(SeattleWeatherPlots.createTemperatureArea(), W, H,
                 "timestamp", "A filled temperature envelope over the year"));
+        plots.put("seattle-weather-05-3d-timestamp", new Figure(SeattleWeatherPlots3d.createTimestampScatter(), CUBE_W, CUBE_H,
+                "timestamp", "A timestamp axis on a 3D cube — the date breaks and labels in calendar terms"));
 
         // --- Geoms.col() (identity columns) ---
         plots.put("meat-4-bar-chart", new Figure(MeatPlots.createBarChartComparison(), W, H,
