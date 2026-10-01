@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.Map;
 import javafx.scene.paint.Color;
 import org.jtaccuino.gog.MinMax;
+import org.jtaccuino.gog.data.Temporals;
+import org.jtaccuino.gog.data.Values;
+import org.jtaccuino.gog.spi.DataExtractor;
 
 /**
  * A continuous colour scale: maps numeric data values to colours by
@@ -133,20 +136,70 @@ public class ContinuousColorScale implements ColorScale {
      * @return the scale, or {@code null} when the values carry no numeric range
      */
     public static ContinuousColorScale forRange(String columnName, List<?> values, String cmapName) {
-        double fMin = Double.MAX_VALUE, fMax = -Double.MAX_VALUE;
-        for (var v : values) {
-            if (v instanceof Number n) {
-                double d = n.doubleValue();
-                if (d < fMin) fMin = d;
-                if (d > fMax) fMax = d;
-            }
-        }
-        if (fMax < fMin) {
+        var range = rangeOf(values);
+        if (range == null) {
             return null;
         }
-        var breaks = Scale.niceBreaks(fMin, fMax, 5);
-        var labels = breaks.stream().map(Scale::formatTick).toList();
-        return new ContinuousColorScale(columnName, fMin, fMax, breaks, labels, cmapName);
+        var type = columnTypeOf(values);
+        var breaks = breaksOf(type, range[0], range[1]);
+        return new ContinuousColorScale(columnName, range[0], range[1], breaks,
+                labelsOf(type, breaks, range[0], range[1]), cmapName);
+    }
+
+    /**
+     * The numeric domain of a colour column, or {@code null} when it carries no
+     * numeric range. Values are positioned through {@link Values}, so a
+     * {@code DATE} or {@code TIMESTAMP} column contributes its epoch position
+     * instead of being skipped.
+     */
+    private static double[] rangeOf(List<?> values) {
+        double min = Double.MAX_VALUE, max = -Double.MAX_VALUE;
+        for (var v : values) {
+            if (v == null) {
+                continue;
+            }
+            double d = Values.toDouble(v, Double.NaN);
+            if (Double.isNaN(d)) {
+                continue;
+            }
+            min = Math.min(min, d);
+            max = Math.max(max, d);
+        }
+        return min <= max ? new double[]{min, max} : null;
+    }
+
+    /** The column type of a colour column, from its first non-null value. */
+    private static DataExtractor.ColumnType columnTypeOf(List<?> values) {
+        for (var v : values) {
+            if (v != null) {
+                return DataExtractor.ColumnType.ofValue(v);
+            }
+        }
+        return DataExtractor.ColumnType.TEXT;
+    }
+
+    /** The colourbar breaks: calendar breaks for a temporal column, else nice numbers. */
+    private static List<Double> breaksOf(DataExtractor.ColumnType type, double min, double max) {
+        if (type == DataExtractor.ColumnType.DATE) {
+            return Temporals.dateTicks(min, max);
+        }
+        if (type == DataExtractor.ColumnType.TIMESTAMP) {
+            return Temporals.timestampTicks(min, max, 5);
+        }
+        return Scale.niceBreaks(min, max, 5);
+    }
+
+    /** The colourbar labels matching {@link #breaksOf}, formatted temporally when needed. */
+    private static List<String> labelsOf(DataExtractor.ColumnType type, List<Double> breaks,
+                                         double min, double max) {
+        if (type == DataExtractor.ColumnType.DATE) {
+            return breaks.stream().map(Temporals::dateLabel).toList();
+        }
+        if (type == DataExtractor.ColumnType.TIMESTAMP) {
+            var granularity = Temporals.granularityOf(min, max, 5);
+            return breaks.stream().map(b -> Temporals.timestampLabel(b, granularity)).toList();
+        }
+        return breaks.stream().map(Scale::formatTick).toList();
     }
 
     private ContinuousColorScale(String columnName, String cmapName) {
@@ -198,20 +251,14 @@ public class ContinuousColorScale implements ColorScale {
      * @return the scale, or {@code null} when the values carry no numeric range
      */
     public static ContinuousColorScale fromColors(String columnName, List<?> values, List<Color> colors) {
-        double fMin = Double.MAX_VALUE, fMax = -Double.MAX_VALUE;
-        for (var v : values) {
-            if (v instanceof Number n) {
-                double d = n.doubleValue();
-                if (d < fMin) fMin = d;
-                if (d > fMax) fMax = d;
-            }
-        }
-        if (fMax < fMin) {
+        var range = rangeOf(values);
+        if (range == null) {
             return null;
         }
-        var breaks = Scale.niceBreaks(fMin, fMax, 5);
-        var labels = breaks.stream().map(Scale::formatTick).toList();
-        return new ContinuousColorScale(columnName, fMin, fMax, breaks, labels, "custom", stopsFromColors(colors));
+        var type = columnTypeOf(values);
+        var breaks = breaksOf(type, range[0], range[1]);
+        return new ContinuousColorScale(columnName, range[0], range[1], breaks,
+                labelsOf(type, breaks, range[0], range[1]), "custom", stopsFromColors(colors));
     }
 
     private ContinuousColorScale(String columnName, double min, double max,

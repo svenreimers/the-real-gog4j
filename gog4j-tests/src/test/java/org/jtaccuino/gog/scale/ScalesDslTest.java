@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDate;
 import java.util.List;
 import javafx.scene.paint.Color;
 import org.dflib.DataFrame;
@@ -377,5 +378,14 @@ class ScalesDslTest {
         assertNull(scales.tooltipShape("cyl", "cyl: 9\nX: 2.5"));
         assertNull(scales.tooltipShape(null, "cyl: 9"));
         assertNull(scales.tooltipShape("cyl", null));
+    }
+
+    @Test
+    void isContinuousColorIncludesTemporalColumns() {
+        var dates = DataFrame.byColumn("when").of(
+                Series.of(LocalDate.of(2010, 1, 1), LocalDate.of(2011, 1, 1)));
+        var scales = ResolvedScales.forData(dates, new DflibDataExtractor(), plot().getScaleSpec(),
+                new LabsSpec(), Theme.theme_gray());
+        assertTrue(scales.isContinuousColor("when"), "a date column colours continuously");
     }
 }

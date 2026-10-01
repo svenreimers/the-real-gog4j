@@ -106,4 +106,19 @@ public class SeattleWeatherPlots {
                                 .geoms(area())
                 .labs(labs("Temperature Range", "Date (2010)", "Temperature (°C)"));
     }
+
+    /**
+     * {@return pressure against temperature coloured continuously by the
+     * timestamp column, so the colourbar reads as a sequence of hours}
+     */
+    @SamplePlot(description = "A scatter coloured continuously by the timestamp column: the colourbar labels read as times.",
+            title = "Colour by Time",
+            dataset = SampleDataset.SEATTLE_WEATHER,
+            geoms = {SampleGeom.POINT},
+            features = {SampleFeature.TWO_D})
+    public static Plot<DataFrame> createColouredByTime() {
+        return ggplot(SeattleWeatherDatasets.loadFirstDay(), aes().x("temperature").y("pressure").color("date"))
+                                .geoms(point())
+                .labs(labs("Colour by Time", "Temperature (°C)", "Pressure (hPa)"));
+    }
 }

@@ -22,6 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import javafx.scene.paint.Color;
 import org.dflib.DataFrame;
@@ -50,6 +52,30 @@ class ColorScaleTest {
     void continuousForRangeReturnsNullWithoutNumbers() {
         assertNull(ContinuousColorScale.forRange("g", List.of("a", "b"), null));
         assertNull(ContinuousColorScale.forRange("g", List.of(), null));
+    }
+
+    @Test
+    void continuousForRangeIncludesDatesAndLabelsThemAsYears() {
+        var dates = List.of(LocalDate.of(2010, 1, 1), LocalDate.of(2011, 6, 1), LocalDate.of(2012, 1, 1));
+        var scale = ContinuousColorScale.forRange("d", dates, null);
+        assertNotNull(scale);
+        assertEquals((double) LocalDate.of(2010, 1, 1).toEpochDay(), scale.min());
+        assertEquals((double) LocalDate.of(2012, 1, 1).toEpochDay(), scale.max());
+        assertEquals(scale.breaks().size(), scale.labels().size());
+        assertTrue(scale.labels().stream().allMatch(l -> l.matches("\\d{4}")),
+                "a date colourbar reads as years, not epoch days: " + scale.labels());
+    }
+
+    @Test
+    void continuousForRangeIncludesTimestampsAndLabelsThemAsDateTimes() {
+        var times = List.of(LocalDateTime.of(2010, 1, 1, 0, 0),
+                LocalDateTime.of(2010, 1, 1, 6, 0), LocalDateTime.of(2010, 1, 1, 12, 0));
+        var scale = ContinuousColorScale.forRange("t", times, null);
+        assertNotNull(scale);
+        assertEquals((double) LocalDateTime.of(2010, 1, 1, 0, 0)
+                .toInstant(java.time.ZoneOffset.UTC).toEpochMilli(), scale.min());
+        assertTrue(scale.labels().stream().anyMatch(l -> l.contains("-")),
+                "a timestamp colourbar reads as a date-time, not epoch millis: " + scale.labels());
     }
 
     @Test

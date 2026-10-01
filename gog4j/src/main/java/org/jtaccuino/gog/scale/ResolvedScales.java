@@ -284,7 +284,9 @@ public final class ResolvedScales<DF> {
                 || spec.isDiscreteColorRamp()) {
             return false;
         }
-        return columnType(columnName) == DataExtractor.ColumnType.NUMBER;
+        // NUMBER, DATE and TIMESTAMP all colour continuously; a manual palette or
+        // a discrete ramp (handled above) stays categorical.
+        return DataExtractor.ColumnType.isContinuous(columnType(columnName));
     }
 
     /**

@@ -18,6 +18,7 @@ package org.jtaccuino.gog.scale;
 import java.util.List;
 import javafx.scene.paint.Color;
 import org.jtaccuino.gog.MinMax;
+import org.jtaccuino.gog.data.Values;
 
 /**
  * A per-column colour resolver: the fully resolved state of a colour/fill
@@ -100,10 +101,12 @@ public final class ColorResolver {
         if (discrete != null) {
             return discrete.colorFor(rawValue);
         }
-        if (!(rawValue instanceof Number n)) {
+        // Route through Values so a temporal colour column resolves to its
+        // epoch position, matching the scale's own domain.
+        double v = Values.toDouble(rawValue, Double.NaN);
+        if (Double.isNaN(v)) {
             return null;
         }
-        double v = n.doubleValue();
         if (binnedColors != null) {
             double span = domain.max() - domain.min();
             int idx = span <= 0 ? 0 : (int) Math.floor((v - domain.min()) / span * steps);

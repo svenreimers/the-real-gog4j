@@ -308,6 +308,19 @@ class SvgMatchesCanvasTest {
     }
 
     @Test
+    void colourByTimestampDrawsATemporalColourbar() throws Exception {
+        assumeTrue(JavaFxToolkitExtension.isToolkitUp());
+        // Colouring by the timestamp column must build a continuous colourbar
+        // whose labels read as a date-time, not as a raw epoch number.
+        var svg = renderToSvg(Ggplot.ggplot(hourlyData(), Aes.aes().x("reading").y("reading").color("when"))
+                .geoms(point())
+                .theme(Theme.theme_bw())
+                .labs("", "reading", "reading"));
+        assertTrue(svg.contains("2010-01-01"),
+                "a timestamp colourbar must label its domain with a date-time");
+    }
+
+    @Test
     void aTemporalColumnOnTheVerticalAxisRenders() throws Exception {
         assumeTrue(JavaFxToolkitExtension.isToolkitUp());
         // A line with the timestamp on y, not x: the averaging path must resolve

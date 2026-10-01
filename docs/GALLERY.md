@@ -17,7 +17,7 @@ Regenerate everything, this page included, with:
 - [`Stats.smooth()`](#statssmooth) — 4 figures
 - [`Stats.bin()`/`Stats.summary()`](#statsbinstatssummary) — 5 figures
 - [`Geoms.line()`](#geomsline) — 5 figures
-- [`ColumnType.TIMESTAMP`](#columntypetimestamp) — 4 figures
+- [`ColumnType.TIMESTAMP`](#columntypetimestamp) — 5 figures
 - [`Geoms.bar()`](#geomsbar) — 2 figures
 - [`Geoms.col()`](#geomscol) — 12 figures
 - [`Geoms.bar()` vs `Geoms.col()`](#geomsbar-vs-geomscol) — 5 figures
@@ -112,6 +112,7 @@ Regenerate everything, this page included, with:
 |---|---|
 | [![Hourly temperature over a year — the timestamp axis breaks the span by month](images/thumbs/seattle-weather-01-yearly-temperature.png)](images/seattle-weather-01-yearly-temperature.svg)<br>**Hourly temperature over a year — the timestamp axis breaks the span by month**<br>[SVG](images/seattle-weather-01-yearly-temperature.svg) · [PNG](images/seattle-weather-01-yearly-temperature.png) | [![Pressure over a single day — the timestamp axis narrows to hourly breaks](images/thumbs/seattle-weather-02-daily-pressure.png)](images/seattle-weather-02-daily-pressure.svg)<br>**Pressure over a single day — the timestamp axis narrows to hourly breaks**<br>[SVG](images/seattle-weather-02-daily-pressure.svg) · [PNG](images/seattle-weather-02-daily-pressure.png) |
 | [![A timestamp column on the y axis — the same break ladder under `coordFlip()`](images/thumbs/seattle-weather-03-flipped.png)](images/seattle-weather-03-flipped.svg)<br>**A timestamp column on the y axis — the same break ladder under `coordFlip()`**<br>[SVG](images/seattle-weather-03-flipped.svg) · [PNG](images/seattle-weather-03-flipped.png) | [![A filled temperature envelope over the year](images/thumbs/seattle-weather-04-area.png)](images/seattle-weather-04-area.svg)<br>**A filled temperature envelope over the year**<br>[SVG](images/seattle-weather-04-area.svg) · [PNG](images/seattle-weather-04-area.png) |
+| [![Continuous colour by the timestamp column — the colourbar labels read as times](images/thumbs/seattle-weather-05-colour-by-time.png)](images/seattle-weather-05-colour-by-time.svg)<br>**Continuous colour by the timestamp column — the colourbar labels read as times**<br>[SVG](images/seattle-weather-05-colour-by-time.svg) · [PNG](images/seattle-weather-05-colour-by-time.png) | |
 
 ## `Geoms.bar()`
 

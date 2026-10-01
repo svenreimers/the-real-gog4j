@@ -2717,7 +2717,7 @@ import org.jtaccuino.gog.theme.ThemeConfigurator;
             return scales().colorScale(columnName);
         }
         var type = descriptor.extractor().columnType(descriptor.data(), columnName);
-        if (type == DataExtractor.ColumnType.NUMBER || type == DataExtractor.ColumnType.DATE) {
+        if (DataExtractor.ColumnType.isContinuous(type)) {
             return continuousColorScale(columnName, descriptor.extractor().getColumn(descriptor.data(), columnName));
         }
         return scales().colorScale(columnName);
