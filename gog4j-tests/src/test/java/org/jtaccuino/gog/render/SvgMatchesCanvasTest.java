@@ -51,6 +51,7 @@ import org.jtaccuino.gog.Ggplot;
 import org.jtaccuino.gog.Guides;
 import org.jtaccuino.gog.Plot;
 import org.jtaccuino.gog.examples.dflib.SeattleWeatherPlots;
+import org.jtaccuino.gog.scale.Scales;
 import org.jtaccuino.gog.test.JavaFxToolkitExtension;
 import org.jtaccuino.gog.theme.GuidePosition;
 import org.jtaccuino.gog.theme.Theme;
@@ -305,6 +306,22 @@ class SvgMatchesCanvasTest {
                    () -> String.format("the timestamp plot's block at %s differs by %.1f grey levels between"
                                        + " the canvas and the SVG rendering, above the %.0f allowed",
                                        worstBlock, worstDelta, MAX_BLOCK_DELTA));
+    }
+
+    @Test
+    void aTemporalLabelFormatOverridesTheDefaultPattern() throws Exception {
+        assumeTrue(JavaFxToolkitExtension.isToolkitUp());
+        // The default labels for a day of hourly readings carry a date and time;
+        // an explicit year pattern must replace them with the bare year.
+        var svg = renderToSvg(Ggplot.ggplot(hourlyData(), Aes.aes().x("when").y("reading"))
+                .geoms(line())
+                .guides(Guides.none())
+                .theme(Theme.theme_bw())
+                .scales(Scales.scaleXTemporalFormat("yyyy"))
+                .labs("", "when", "reading"));
+        assertTrue(svg.contains("2010"), "the requested year pattern must label the axis");
+        assertFalse(svg.contains("2010-01-01"),
+                "the granularity-derived date-time pattern must be replaced");
     }
 
     @Test

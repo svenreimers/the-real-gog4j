@@ -15,6 +15,7 @@
  */
 package org.jtaccuino.gog.scale;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -49,6 +50,7 @@ public class Scale {
     private Map<Double, String> positionLabels;
     private boolean dateScale;
     private boolean timestampScale;
+    private DateTimeFormatter temporalFormat;
 
     /**
      * Creates a scale mapping the given data range onto the given pixel range.
@@ -166,6 +168,25 @@ public class Scale {
 
     /** {@return whether this scale maps a timestamp column} */
     public boolean isTimestampScale() { return timestampScale; }
+
+    /**
+     * Sets an explicit label format for a temporal axis, overriding the pattern
+     * the break granularity would choose. Only consulted for a date or timestamp
+     * scale; the break positions themselves are unaffected, so a format may be
+     * chosen independently of the step.
+     *
+     * @param temporalFormat the label format, or {@code null} to use the
+     *                       granularity-derived default
+     */
+    public void setTemporalFormat(DateTimeFormatter temporalFormat) {
+        this.temporalFormat = temporalFormat;
+    }
+
+    /**
+     * {@return the explicit temporal label format, or {@code null} when the
+     * granularity-derived default applies}
+     */
+    public DateTimeFormatter temporalFormat() { return temporalFormat; }
 
     /**
      * Registers explicit tick positions mapped to custom label strings.

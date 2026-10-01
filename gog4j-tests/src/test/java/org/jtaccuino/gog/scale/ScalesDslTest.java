@@ -378,4 +378,23 @@ class ScalesDslTest {
         assertNull(scales.tooltipShape(null, "cyl: 9"));
         assertNull(scales.tooltipShape("cyl", null));
     }
+
+    @Test
+    void temporalFormatSetsTheAxisLabelPattern() {
+        var spec = plot()
+                .scales(Scales.scaleXTemporalFormat("MMM yyyy"))
+                .scales(Scales.scaleYTemporalFormat("HH:mm"))
+                .scales(Scales.scaleZTemporalFormat("yyyy-MM-dd"))
+                .getScaleSpec();
+        assertEquals("MMM yyyy", spec.getXTimeFormat());
+        assertEquals("HH:mm", spec.getYTimeFormat());
+        assertEquals("yyyy-MM-dd", spec.getZTimeFormat());
+        assertNull(plot().getScaleSpec().getXTimeFormat());
+    }
+
+    @Test
+    void temporalFormatRejectsAnInvalidPattern() {
+        assertThrows(IllegalArgumentException.class, () -> Scales.scaleXTemporalFormat("not a pattern ["));
+        assertThrows(IllegalArgumentException.class, () -> Scales.scaleYTemporalFormat(null));
+    }
 }

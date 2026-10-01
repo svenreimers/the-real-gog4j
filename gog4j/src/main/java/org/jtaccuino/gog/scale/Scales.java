@@ -15,6 +15,7 @@
  */
 package org.jtaccuino.gog.scale;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -109,6 +110,51 @@ public class Scales {
             plot.getScaleSpec().setYBreaks(breaks);
             plot.getScaleSpec().setYLabels(labels);
         };
+    }
+
+    /**
+     * Sets an explicit label format for a {@code DATE}/{@code TIMESTAMP} X axis,
+     * overriding the pattern the break granularity would choose. The pattern
+     * uses {@link DateTimeFormatter} syntax; the break positions are unaffected.
+     *
+     * @param pattern the label pattern
+     * @return a {@link ScaleConfigurator} applying the format
+     * @throws IllegalArgumentException if the pattern is null or not a valid
+     *         {@link DateTimeFormatter} pattern
+     */
+    public static ScaleConfigurator scaleXTemporalFormat(String pattern) {
+        requirePattern(pattern);
+        return plot -> plot.getScaleSpec().setXTimeFormat(pattern);
+    }
+
+    /**
+     * Sets an explicit label format for a {@code DATE}/{@code TIMESTAMP} Y axis,
+     * overriding the pattern the break granularity would choose. The pattern
+     * uses {@link DateTimeFormatter} syntax; the break positions are unaffected.
+     *
+     * @param pattern the label pattern
+     * @return a {@link ScaleConfigurator} applying the format
+     * @throws IllegalArgumentException if the pattern is null or not a valid
+     *         {@link DateTimeFormatter} pattern
+     */
+    public static ScaleConfigurator scaleYTemporalFormat(String pattern) {
+        requirePattern(pattern);
+        return plot -> plot.getScaleSpec().setYTimeFormat(pattern);
+    }
+
+    /**
+     * Sets an explicit label format for a {@code DATE}/{@code TIMESTAMP} Z axis,
+     * overriding the pattern the break granularity would choose. The pattern
+     * uses {@link DateTimeFormatter} syntax; the break positions are unaffected.
+     *
+     * @param pattern the label pattern
+     * @return a {@link ScaleConfigurator} applying the format
+     * @throws IllegalArgumentException if the pattern is null or not a valid
+     *         {@link DateTimeFormatter} pattern
+     */
+    public static ScaleConfigurator scaleZTemporalFormat(String pattern) {
+        requirePattern(pattern);
+        return plot -> plot.getScaleSpec().setZTimeFormat(pattern);
     }
 
     /**
@@ -584,6 +630,20 @@ public class Scales {
             if (c == null) {
                 throw new IllegalArgumentException("gradient colours must be non-null");
             }
+        }
+    }
+
+    // Builds the formatter only to validate the pattern eagerly, so a bad
+    // pattern fails at configuration time rather than at render time.
+    @SuppressWarnings("ReturnValueIgnored")
+    private static void requirePattern(String pattern) {
+        if (pattern == null || pattern.isEmpty()) {
+            throw new IllegalArgumentException("temporal label pattern must be non-empty");
+        }
+        try {
+            DateTimeFormatter.ofPattern(pattern);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("invalid temporal label pattern: " + pattern, e);
         }
     }
 }

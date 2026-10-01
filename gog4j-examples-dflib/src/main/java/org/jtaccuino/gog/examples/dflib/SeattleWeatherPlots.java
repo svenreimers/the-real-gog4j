@@ -31,6 +31,7 @@ import org.jtaccuino.gog.sampler.meta.SampleDataset;
 import org.jtaccuino.gog.sampler.meta.SampleFeature;
 import org.jtaccuino.gog.sampler.meta.SampleGeom;
 import org.jtaccuino.gog.sampler.meta.SamplePlot;
+import org.jtaccuino.gog.scale.Scales;
 
 /**
  * Example plot definitions using the Seattle hourly weather normals dataset.
@@ -105,5 +106,21 @@ public class SeattleWeatherPlots {
         return ggplot(SeattleWeatherDatasets.loadHourly(), aes().x("date").y("temperature"))
                                 .geoms(area())
                 .labs(labs("Temperature Range", "Date (2010)", "Temperature (°C)"));
+    }
+
+    /**
+     * {@return the yearly temperature with year-only tick labels, set through an
+     * explicit temporal format rather than the granularity-derived default}
+     */
+    @SamplePlot(description = "Year-only tick labels on a timestamp axis, via scaleXTemporalFormat(\"yyyy\").",
+            title = "Year-only Time Labels",
+            dataset = SampleDataset.SEATTLE_WEATHER,
+            geoms = {SampleGeom.LINE},
+            features = {SampleFeature.TWO_D})
+    public static Plot<DataFrame> createYearOnlyLabels() {
+        return ggplot(SeattleWeatherDatasets.loadHourly(), aes().x("date").y("temperature"))
+                                .geoms(line())
+                .scales(Scales.scaleXTemporalFormat("yyyy"))
+                .labs(labs("Year-only Labels", "Date (2010)", "Temperature (°C)"));
     }
 }

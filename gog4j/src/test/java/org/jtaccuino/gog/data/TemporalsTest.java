@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -217,6 +218,20 @@ class TemporalsTest {
         assertEquals("2010-01-01 01:00", Temporals.label(LocalDateTime.of(2010, 1, 1, 1, 0)));
         assertEquals("2010-01-01 01:00:30", Temporals.label(LocalDateTime.of(2010, 1, 1, 1, 0, 30)));
         assertEquals("2010-01-01 01:00", Temporals.label(Instant.parse("2010-01-01T01:00:00Z")));
+    }
+
+    @Test
+    void anExplicitFormatOverridesTheGranularityPattern() {
+        var position = millis(LocalDateTime.of(2010, 3, 4, 5, 6, 7));
+        assertEquals("2010",
+                Temporals.timestampLabel(position, DateTimeFormatter.ofPattern("yyyy")));
+        // Numeric fields only, so the assertion does not depend on the JVM locale
+        // that DateTimeFormatter.ofPattern uses for text fields such as MMM.
+        assertEquals("04/03/2010 05:06",
+                Temporals.timestampLabel(position, DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+        assertEquals("2010",
+                Temporals.dateLabel((double) LocalDate.of(2010, 3, 4).toEpochDay(),
+                        DateTimeFormatter.ofPattern("yyyy")));
     }
 
     @Test

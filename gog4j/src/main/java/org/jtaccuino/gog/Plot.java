@@ -15,6 +15,7 @@
  */
 package org.jtaccuino.gog;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -56,6 +57,7 @@ import org.jtaccuino.gog.coord.CoordFixed;
 import org.jtaccuino.gog.coord.CoordPolar;
 import org.jtaccuino.gog.coord.CubeFace;
 import org.jtaccuino.gog.coord.Light3d;
+import org.jtaccuino.gog.data.Temporals;
 import org.jtaccuino.gog.data.Values;
 import org.jtaccuino.gog.facet.FacetGrid;
 import org.jtaccuino.gog.facet.FacetSpec;
@@ -1078,19 +1080,37 @@ import org.jtaccuino.gog.theme.ThemeConfigurator;
      * @param scaleY       the vertical scale
      * @param xColumnType  the column type of the x aesthetic, or {@code null} when unmapped
      * @param yColumnType  the column type of the y aesthetic, or {@code null} when unmapped
+     * @param spec         the plot's scale specification, carrying any explicit temporal formats
      */
     private static void applyTimeAxisFlags(boolean flipped, Scale scaleX, Scale scaleY,
-                                           DataExtractor.ColumnType xColumnType, DataExtractor.ColumnType yColumnType) {
+                                           DataExtractor.ColumnType xColumnType, DataExtractor.ColumnType yColumnType,
+                                           ScaleSpec spec) {
         var xType = flipped ? yColumnType : xColumnType;
         var yType = flipped ? xColumnType : yColumnType;
+        // The formats belong to the aesthetics, so they swap with the axes too.
+        var xPattern = flipped ? spec.getYTimeFormat() : spec.getXTimeFormat();
+        var yPattern = flipped ? spec.getXTimeFormat() : spec.getYTimeFormat();
         if (scaleX != null) {
             scaleX.setDateScale(xType == DataExtractor.ColumnType.DATE);
             scaleX.setTimestampScale(xType == DataExtractor.ColumnType.TIMESTAMP);
+            scaleX.setTemporalFormat(temporalFormatOf(xPattern));
         }
         if (scaleY != null) {
             scaleY.setDateScale(yType == DataExtractor.ColumnType.DATE);
             scaleY.setTimestampScale(yType == DataExtractor.ColumnType.TIMESTAMP);
+            scaleY.setTemporalFormat(temporalFormatOf(yPattern));
         }
+    }
+
+    /**
+     * Parses a temporal label pattern into a formatter, or returns {@code null}
+     * when no pattern is configured.
+     *
+     * @param pattern the {@link DateTimeFormatter} pattern, or {@code null}
+     * @return the formatter, or {@code null}
+     */
+    private static DateTimeFormatter temporalFormatOf(String pattern) {
+        return pattern == null ? null : DateTimeFormatter.ofPattern(pattern);
     }
 
     /**
@@ -1490,6 +1510,35 @@ import org.jtaccuino.gog.theme.ThemeConfigurator;
         }
         if (type == DataExtractor.ColumnType.DATE) {
             predictedYLabelCache = 20.0; // four-digit years, like Coord2D's date labels
+            return predictedYLabelCache;
+        }
+        if (type == DataExtractor.ColumnType.TIMESTAMP) {
+            double min = Double.MAX_VALUE;
+            double max = -Double.MAX_VALUE;
+            for (var v : values) {
+                if (v == null) continue;
+                var d = Values.toDouble(v, Double.NaN);
+                if (!Double.isNaN(d)) {
+                    min = Math.min(min, d);
+                    max = Math.max(max, d);
+                }
+            }
+            // Timestamp labels are wider than a bare year, so measure the labels
+            // the axis will actually print. Date labels keep their fixed year width.
+            double widest = 20.0;
+            if (min <= max) {
+                var flipped = descriptor.coord().isFlipped();
+                var pattern = flipped ? descriptor.scaleSpec().getXTimeFormat()
+                        : descriptor.scaleSpec().getYTimeFormat();
+                var format = pattern == null ? null : DateTimeFormatter.ofPattern(pattern);
+                for (var tick : Temporals.timestampTicks(min, max, 5)) {
+                    var label = format != null ? Temporals.timestampLabel(tick, format)
+                            : Temporals.timestampLabel(tick, Temporals.granularityOf(min, max, 5));
+                    helper.setText(label);
+                    widest = Math.max(widest, helper.getLayoutBounds().getWidth());
+                }
+            }
+            predictedYLabelCache = widest;
             return predictedYLabelCache;
         }
         double widest = 0.0;
@@ -3048,7 +3097,8 @@ import org.jtaccuino.gog.theme.ThemeConfigurator;
             // theta axis can label epoch-day and epoch-millisecond positions as
             // dates and times just like a Cartesian axis does. Under coordFlip()
             // each scale maps the other aesthetic.
-            applyTimeAxisFlags(descriptor.coord().isFlipped(), scaleX, scaleY, xColumnType, yColumnType);
+            applyTimeAxisFlags(descriptor.coord().isFlipped(), scaleX, scaleY, xColumnType, yColumnType,
+                    descriptor.scaleSpec());
 
             // Logarithmic y-axis (scaleYLog10): apply to whichever scale maps the y data.
             // For Manhattan raw-p plots, reverse it so the most significant (smallest)
@@ -3496,7 +3546,8 @@ import org.jtaccuino.gog.theme.ThemeConfigurator;
                     scaleY = yDom.discrete() ? Scale.createDiscrete(yDom.cats(), innerYMin, innerYMax)
                             : new Scale(yDom.num().min(), yDom.num().max(), innerYMin, innerYMax, yTransform);
                 }
-                applyTimeAxisFlags(descriptor.coord().isFlipped(), scaleX, scaleY, xColumnType, yColumnType);
+                applyTimeAxisFlags(descriptor.coord().isFlipped(), scaleX, scaleY, xColumnType, yColumnType,
+                    descriptor.scaleSpec());
                 if (descriptor.scaleSpec().isYLog() && !yIsDiscrete
                         && !(descriptor.coord() instanceof Coord2D c2d && c2d.transY() != null)) {
                     var yScale = descriptor.coord().isFlipped() ? scaleX : scaleY;

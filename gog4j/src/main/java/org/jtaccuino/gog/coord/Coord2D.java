@@ -503,14 +503,18 @@ public class Coord2D implements Coord {
      *
      * @param tick  the break position in data units
      * @param type  the column type mapped to the axis
-     * @param scale the axis scale, consulted only for a timestamp axis
+     * @param scale the axis scale, consulted for an explicit format or the timestamp granularity
      * @return the formatted label
      */
     private static String temporalLabel(double tick, DataExtractor.ColumnType type, Scale scale) {
+        var format = scale != null ? scale.temporalFormat() : null;
         if (type == DataExtractor.ColumnType.DATE) {
-            return Temporals.dateLabel(tick);
+            return format != null ? Temporals.dateLabel(tick, format) : Temporals.dateLabel(tick);
         }
         if (type == DataExtractor.ColumnType.TIMESTAMP) {
+            if (format != null) {
+                return Temporals.timestampLabel(tick, format);
+            }
             var granularity = Temporals.granularityOf(scale.minData(), scale.maxData(), DEFAULT_BREAKS);
             return Temporals.timestampLabel(tick, granularity);
         }

@@ -351,6 +351,8 @@ public class PlotExporter {
                 "timestamp", "A timestamp column on the y axis — the same break ladder under `coordFlip()`"));
         plots.put("seattle-weather-04-area", new Figure(SeattleWeatherPlots.createTemperatureArea(), W, H,
                 "timestamp", "A filled temperature envelope over the year"));
+        plots.put("seattle-weather-05-year-labels", new Figure(SeattleWeatherPlots.createYearOnlyLabels(), W, H,
+                "timestamp", "Year-only tick labels — `scaleXTemporalFormat(\"yyyy\")` overrides the default pattern"));
 
         // --- Geoms.col() (identity columns) ---
         plots.put("meat-4-bar-chart", new Figure(MeatPlots.createBarChartComparison(), W, H,

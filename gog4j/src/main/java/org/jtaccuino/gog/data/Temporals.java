@@ -326,6 +326,18 @@ public final class Temporals {
     }
 
     /**
+     * The label for a break on a date axis formatted with an explicit pattern,
+     * as requested through a temporal scale's label format.
+     *
+     * @param epochDay the break position, in epoch days
+     * @param format   the label format
+     * @return the label text
+     */
+    public static String dateLabel(double epochDay, DateTimeFormatter format) {
+        return format.format(dateAt(epochDay));
+    }
+
+    /**
      * The label for a break on a timestamp axis, at the granularity the axis
      * breaks at: a bare year when the steps span years, the date from month
      * granularity down, and the date and time from hour granularity down.
@@ -336,6 +348,20 @@ public final class Temporals {
      */
     public static String timestampLabel(double position, Granularity granularity) {
         return granularity.labelFormat.format(dateTimeAt(position));
+    }
+
+    /**
+     * The label for a break on a timestamp axis formatted with an explicit
+     * pattern, as requested through a temporal scale's label format. The pattern
+     * replaces the granularity-derived default; the break positions still come
+     * from the span's step ladder.
+     *
+     * @param position the break position, in epoch milliseconds
+     * @param format   the label format
+     * @return the label text
+     */
+    public static String timestampLabel(double position, DateTimeFormatter format) {
+        return format.format(dateTimeAt(position));
     }
 
     /**

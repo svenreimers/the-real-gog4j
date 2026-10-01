@@ -541,10 +541,14 @@ public class CoordPolar implements Coord {
      * @return the formatted label
      */
     private static String temporalLabel(double tick, Scale scale, int target) {
+        var format = scale.temporalFormat();
         if (scale.isTimestampScale()) {
+            if (format != null) {
+                return Temporals.timestampLabel(tick, format);
+            }
             return Temporals.timestampLabel(tick, Temporals.granularityOf(scale.minData(), scale.maxData(), target));
         }
-        return Temporals.dateLabel(tick);
+        return format != null ? Temporals.dateLabel(tick, format) : Temporals.dateLabel(tick);
     }
 
     /**

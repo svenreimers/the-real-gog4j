@@ -52,6 +52,9 @@ public class ScaleSpec {
         this.xLabels = other.xLabels == null ? null : List.copyOf(other.xLabels);
         this.yLabels = other.yLabels == null ? null : List.copyOf(other.yLabels);
         this.zLabels = other.zLabels == null ? null : List.copyOf(other.zLabels);
+        this.xTimeFormat = other.xTimeFormat;
+        this.yTimeFormat = other.yTimeFormat;
+        this.zTimeFormat = other.zTimeFormat;
         this.manualColors = other.manualColors == null ? null : new LinkedHashMap<>(other.manualColors);
         this.continuousColorMap = other.continuousColorMap;
         this.continuousGradient = other.continuousGradient == null ? null : List.copyOf(other.continuousGradient);
@@ -87,6 +90,9 @@ public class ScaleSpec {
     private List<String> xLabels = null;
     private List<String> yLabels = null;
     private List<String> zLabels = null;
+    private String xTimeFormat = null;
+    private String yTimeFormat = null;
+    private String zTimeFormat = null;
     private Map<String, Color> manualColors = null;
     private String continuousColorMap = null;
     private List<Color> continuousGradient = null;
@@ -191,6 +197,57 @@ public class ScaleSpec {
      * @param zLabels list of labels, one per break
      */
     public void setZLabels(List<String> zLabels) { this.zLabels = zLabels; }
+
+    /**
+     * Returns the explicit temporal label format for the X-axis.
+     *
+     * @return a {@link java.time.format.DateTimeFormatter} pattern, or
+     *         {@code null} to derive the format from the break granularity
+     */
+    public String getXTimeFormat() { return xTimeFormat; }
+
+    /**
+     * Sets the explicit temporal label format for the X-axis, applied when the
+     * axis maps a {@code DATE} or {@code TIMESTAMP} column. The pattern uses
+     * {@link java.time.format.DateTimeFormatter} syntax.
+     *
+     * @param xTimeFormat the label pattern, or {@code null} for the default
+     */
+    public void setXTimeFormat(String xTimeFormat) { this.xTimeFormat = xTimeFormat; }
+
+    /**
+     * Returns the explicit temporal label format for the Y-axis.
+     *
+     * @return a {@link java.time.format.DateTimeFormatter} pattern, or
+     *         {@code null} to derive the format from the break granularity
+     */
+    public String getYTimeFormat() { return yTimeFormat; }
+
+    /**
+     * Sets the explicit temporal label format for the Y-axis, applied when the
+     * axis maps a {@code DATE} or {@code TIMESTAMP} column. The pattern uses
+     * {@link java.time.format.DateTimeFormatter} syntax.
+     *
+     * @param yTimeFormat the label pattern, or {@code null} for the default
+     */
+    public void setYTimeFormat(String yTimeFormat) { this.yTimeFormat = yTimeFormat; }
+
+    /**
+     * Returns the explicit temporal label format for the Z-axis.
+     *
+     * @return a {@link java.time.format.DateTimeFormatter} pattern, or
+     *         {@code null} to derive the format from the break granularity
+     */
+    public String getZTimeFormat() { return zTimeFormat; }
+
+    /**
+     * Sets the explicit temporal label format for the Z-axis, applied when the
+     * axis maps a {@code DATE} or {@code TIMESTAMP} column. The pattern uses
+     * {@link java.time.format.DateTimeFormatter} syntax.
+     *
+     * @param zTimeFormat the label pattern, or {@code null} for the default
+     */
+    public void setZTimeFormat(String zTimeFormat) { this.zTimeFormat = zTimeFormat; }
 
     /**
      * Checks whether custom X-breaks have been configured.
