@@ -50,6 +50,12 @@
     -fx-font-size: 12px;
 }
 
+.sampler-card-attribution {
+    -fx-text-fill: #6b6b6b;
+    -fx-font-size: 11px;
+    -fx-font-style: italic;
+}
+
 .sampler-card-failure {
     -fx-text-fill: brown;
 }

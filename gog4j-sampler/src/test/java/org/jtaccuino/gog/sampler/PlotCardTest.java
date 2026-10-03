@@ -38,6 +38,8 @@ import org.jtaccuino.gog.GgFigurePane;
 import org.jtaccuino.gog.Ggplot;
 import org.jtaccuino.gog.RenderMode;
 import org.jtaccuino.gog.render.FxDrawSurface;
+import org.jtaccuino.gog.sampler.meta.DatasetAttribution;
+import org.jtaccuino.gog.sampler.meta.Origin;
 import org.jtaccuino.gog.sampler.registry.SamplerExample;
 import org.jtaccuino.gog.sampler.ui.LoadProgressSupport;
 import org.junit.jupiter.api.AfterEach;
@@ -175,6 +177,38 @@ class PlotCardTest {
             assertTrue(drawer.sourceArea().getText().startsWith("var df = MpgDatasets.loadMpg();"),
                     "card's drawer must carry the example's dedented source");
             assertFalse(drawer.isOpen(), "setting an example must leave the drawer collapsed");
+        });
+    }
+
+    @Test
+    void setSpecShowsDatasetAttribution() throws Exception {
+        var attribution = new DatasetAttribution("penguins", "palmerpenguins (R)",
+                "https://allisonhorst.github.io/palmerpenguins/", "K. B. Gorman",
+                "CC0-1.0", "Creative Commons Zero v1.0 Universal",
+                "https://creativecommons.org/publicdomain/zero/1.0/",
+                Origin.UPSTREAM, "", "", List.of());
+        var example = new SamplerExample("Attributed", "desc", "factory",
+                () -> new Pane(), List.of(), "", attribution);
+
+        var card = new PlotCard[1];
+        onFx(() -> {
+            var c = new PlotCard();
+            c.setPrefSize(500, 600);
+            new Scene(new StackPane(c));
+            card[0] = c;
+            c.setSpec(example.toSpec());
+        });
+
+        onFx(() -> {
+            // Content children: 0 title, 1 tag chips, 2 plot pane, 3 timing,
+            // 4 description, 5 dataset attribution.
+            var content = (Pane) card[0].getChildren().get(0);
+            var label = (Label) content.getChildren().get(5);
+            assertTrue(label.getText().contains("palmerpenguins"),
+                    "the card must show the dataset source, got '" + label.getText() + "'");
+            assertTrue(label.getText().contains("Creative Commons Zero"),
+                    "the card must show the dataset licence, got '" + label.getText() + "'");
+            assertTrue(label.isManaged(), "a non-empty attribution must be visible");
         });
     }
 

@@ -154,11 +154,13 @@ public class PlotBuilder extends BorderPane {
         }
         datasetCombo.getItems().setAll(this.datasets);
         datasetCombo.setValue(model.dataset());
+        updateDatasetAttribution(model.dataset());
         reloadColumns();
         refresh();
     }
 
     private final ComboBox<PlotDataset> datasetCombo = new ComboBox<>();
+    private final Label datasetAttributionLabel = new Label();
 
     // ─── Sections (accordion panes) ─────────────────────────────────────
 
@@ -187,8 +189,21 @@ public class PlotBuilder extends BorderPane {
                 reloadColumns();
                 scheduleRefresh();
             }
+            updateDatasetAttribution(now);
         });
-        return new VBox(4, datasetCombo);
+        datasetAttributionLabel.setWrapText(true);
+        datasetAttributionLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #666666; -fx-font-style: italic;");
+        datasetAttributionLabel.setManaged(false);
+        datasetAttributionLabel.setVisible(false);
+        return new VBox(4, datasetCombo, datasetAttributionLabel);
+    }
+
+    private void updateDatasetAttribution(PlotDataset dataset) {
+        var lines = dataset == null ? List.<String>of() : dataset.attributionLines();
+        datasetAttributionLabel.setText(String.join("\n", lines));
+        var present = !lines.isEmpty();
+        datasetAttributionLabel.setManaged(present);
+        datasetAttributionLabel.setVisible(present);
     }
 
     private GridPane mappingPane() {

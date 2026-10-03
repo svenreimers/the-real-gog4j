@@ -23,6 +23,10 @@ import org.dflib.csv.Csv;
  * Data loading for the restaurant-tips dataset, the canonical mixed-type
  * showcase of a generalized pairs plot.
  * <p>
+ * The data comes from the reshape2 R package (MIT licence); the underlying
+ * study is Bryant &amp; Smith (1995). Provenance and licence are recorded in
+ * {@code META-INF/gog4j/datasets.properties} and the repository {@code NOTICE}.
+ * <p>
  * Provides a {@link #loadTips()} method that returns a DataFrame with the
  * numerical columns total_bill, tip and size next to the categorical columns
  * sex, smoker, day and time.

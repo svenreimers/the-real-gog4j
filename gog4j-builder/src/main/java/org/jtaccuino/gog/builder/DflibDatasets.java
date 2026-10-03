@@ -30,6 +30,7 @@ import org.jtaccuino.gog.dflib.data.MtcarsDatasets;
 import org.jtaccuino.gog.dflib.data.PenguinsDatasets;
 import org.jtaccuino.gog.dflib.data.SpherePointsDatasets;
 import org.jtaccuino.gog.dflib.data.TipsDatasets;
+import org.jtaccuino.gog.sampler.meta.SampleDataset;
 
 /**
  * The built-in dflib datasets offered by the {@code PlotBuilder}, each adapted
@@ -45,32 +46,37 @@ public final class DflibDatasets {
     /** The datasets the builder offers, in display order. */
     public static List<PlotDataset> all() {
         return List.of(
-                dflib("MPG", "MpgDatasets.loadMpg()", "org.jtaccuino.gog.dflib.data.MpgDatasets",
-                        MpgDatasets::loadMpg),
-                dflib("Diamonds", "DiamondsDatasets.loadDiamonds()",
+                dflib("MPG", SampleDataset.MPG, "MpgDatasets.loadMpg()",
+                        "org.jtaccuino.gog.dflib.data.MpgDatasets", MpgDatasets::loadMpg),
+                dflib("Diamonds", SampleDataset.DIAMONDS, "DiamondsDatasets.loadDiamonds()",
                         "org.jtaccuino.gog.dflib.data.DiamondsDatasets", DiamondsDatasets::loadDiamonds),
-                dflib("Penguins", "PenguinsDatasets.loadPenguins()",
+                dflib("Penguins", SampleDataset.PENGUINS, "PenguinsDatasets.loadPenguins()",
                         "org.jtaccuino.gog.dflib.data.PenguinsDatasets", PenguinsDatasets::loadPenguins),
-                dflib("Tips", "TipsDatasets.loadTips()", "org.jtaccuino.gog.dflib.data.TipsDatasets",
-                        TipsDatasets::loadTips),
-                dflib("Faithful", "FaithfulDatasets.loadFaithful()",
+                dflib("Tips", SampleDataset.TIPS, "TipsDatasets.loadTips()",
+                        "org.jtaccuino.gog.dflib.data.TipsDatasets", TipsDatasets::loadTips),
+                dflib("Faithful", SampleDataset.FAITHFUL, "FaithfulDatasets.loadFaithful()",
                         "org.jtaccuino.gog.dflib.data.FaithfulDatasets", FaithfulDatasets::loadFaithful),
-                dflib("Mtcars", "MtcarsDatasets.loadNumericMtcars()",
+                dflib("Mtcars", SampleDataset.MTCARS, "MtcarsDatasets.loadNumericMtcars()",
                         "org.jtaccuino.gog.dflib.data.MtcarsDatasets", MtcarsDatasets::loadNumericMtcars),
-                dflib("Meat", "MeatDatasets.getProductionData()",
+                dflib("Meat", SampleDataset.MEAT, "MeatDatasets.getProductionData()",
                         "org.jtaccuino.gog.dflib.data.MeatDatasets", MeatDatasets::getProductionData),
-                dflib("Mountain Surface", "MountainDatasets.loadMountain()",
+                dflib("Mountain Surface", SampleDataset.MOUNTAIN, "MountainDatasets.loadMountain()",
                         "org.jtaccuino.gog.dflib.data.MountainDatasets", MountainDatasets::loadMountain),
-                dflib("Sphere Points", "SpherePointsDatasets.loadSpherePoints()",
+                dflib("Sphere Points", SampleDataset.SPHERE, "SpherePointsDatasets.loadSpherePoints()",
                         "org.jtaccuino.gog.dflib.data.SpherePointsDatasets", SpherePointsDatasets::loadSpherePoints));
     }
 
-    private static PlotDataset dflib(String displayName, String loaderExpr, String loaderImport,
-            Supplier<DataFrame> loader) {
+    private static PlotDataset dflib(String displayName, SampleDataset dataset, String loaderExpr,
+            String loaderImport, Supplier<DataFrame> loader) {
         return new PlotDataset() {
             @Override
             public String displayName() {
                 return displayName;
+            }
+
+            @Override
+            public List<String> attributionLines() {
+                return dataset.attribution().displayLines();
             }
 
             @Override

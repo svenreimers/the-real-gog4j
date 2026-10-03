@@ -51,7 +51,8 @@ final class SamplerQuery {
 
     /**
      * Returns whether the free-text query is contained in the example's title,
-     * method name, description, or any tag name/label, case-insensitively.
+     * method name, description, dataset attribution, or any tag name/label,
+     * case-insensitively.
      *
      * @param example the example to test
      * @param query the free-text search query, or {@code null}/blank for none
@@ -65,6 +66,8 @@ final class SamplerQuery {
         var haystack = (example.displayTitle() + " " + example.methodName() + " "
                 + (example.description() == null ? "" : example.description()))
                 .toLowerCase(Locale.ROOT)
+                + " " + String.join(" ", example.attribution().displayLines())
+                        .toLowerCase(Locale.ROOT)
                 + " " + example.tags().stream()
                         .map(tag -> tag.name() + " " + tag.label())
                         .reduce("", (a, b) -> a + " " + b)

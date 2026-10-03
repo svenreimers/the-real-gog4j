@@ -45,4 +45,15 @@ public interface PlotDataset {
 
     /** The import the loader expression needs, or an empty string. */
     String loaderImport();
+
+    /**
+     * Provenance/licence lines shown under the dataset picker, e.g. the source
+     * name, licence and citation. The default is no attribution; built-in
+     * datasets override it, and hosts may leave it empty.
+     *
+     * @return the attribution display lines, possibly empty
+     */
+    default List<String> attributionLines() {
+        return List.of();
+    }
 }

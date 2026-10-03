@@ -19,6 +19,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
+import org.jtaccuino.gog.sampler.meta.DatasetAttribution;
+import org.jtaccuino.gog.sampler.meta.Origin;
 import org.jtaccuino.gog.sampler.registry.SamplerExample;
 import org.jtaccuino.gog.sampler.registry.Tag;
 import org.junit.jupiter.api.Test;
@@ -63,6 +65,21 @@ class SamplerQueryTest {
         var ex = example("Title", null);
         assertTrue(SamplerQuery.matchesText(ex, "geom:point"));
         assertTrue(SamplerQuery.matchesText(ex, "point"));
+    }
+
+    @Test
+    void matchesOnDatasetAttributionText() {
+        var attribution = new DatasetAttribution("penguins", "palmerpenguins (R)",
+                "https://allisonhorst.github.io/palmerpenguins/", "K. B. Gorman",
+                "CC0-1.0", "Creative Commons Zero v1.0 Universal",
+                "https://creativecommons.org/publicdomain/zero/1.0/",
+                Origin.UPSTREAM, "", "", List.of());
+        var ex = new SamplerExample("Scatter", null, "createExample", () -> new Object(),
+                List.of(FAKE), "source", attribution);
+        assertTrue(SamplerQuery.matchesText(ex, "cc0"),
+                "the licence id must be part of the search haystack");
+        assertTrue(SamplerQuery.matchesText(ex, "palmerpenguins"),
+                "the source name must be part of the search haystack");
     }
 
     @Test

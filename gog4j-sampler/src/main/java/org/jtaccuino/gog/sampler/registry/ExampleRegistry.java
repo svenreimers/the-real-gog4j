@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.Supplier;
+import org.jtaccuino.gog.sampler.meta.DatasetAttribution;
 
 /**
  * Runtime registry of all sampler examples.
@@ -87,6 +88,7 @@ public final class ExampleRegistry {
         var description = props.getProperty(key + "description");
         var source = new String(Base64.getDecoder().decode(props.getProperty(key + "source")),
                 StandardCharsets.UTF_8);
+        var attribution = decodeAttribution(props.getProperty(key + "attribution"));
 
         // The single comma-separated tags list already carries the dataset tag
         // first; every id resolves against the enum-derived catalogue.
@@ -98,7 +100,14 @@ public final class ExampleRegistry {
         }
 
         return new SamplerExample(title, description, methodName,
-                factoryFor(declaringClass, methodName), List.copyOf(tags), source);
+                factoryFor(declaringClass, methodName), List.copyOf(tags), source, attribution);
+    }
+
+    private static DatasetAttribution decodeAttribution(String encoded) {
+        // Older generated resources predate the attribution key.
+        return encoded == null || encoded.isBlank()
+                ? DatasetAttribution.none()
+                : DatasetAttribution.decode(encoded);
     }
 
     private static Supplier<Object> factoryFor(String declaringClass, String methodName) {

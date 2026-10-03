@@ -21,9 +21,9 @@ package org.jtaccuino.gog.sampler.meta;
  * themes, guide strategies, and feature tags apart. Every {@link SamplePlot}
  * carries exactly one dataset tag and any number of the other kinds.
  * <p>
- * This enum lives in the {@code ap} source set alongside the {@code Sample*}
- * tag catalogs so each catalog can reference its kind at compile time; the
- * runtime {@code Tag} record (main) reads it from the classifier classpath.
+ * This enum lives in the annotations module alongside the {@code Sample*} tag
+ * catalogs so each catalog can reference its kind at compile time; the runtime
+ * {@code Tag} record in {@code gog4j-sampler} reads it at runtime.
  */
 public enum TagKind {
 

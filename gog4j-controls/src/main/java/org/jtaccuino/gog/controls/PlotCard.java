@@ -49,8 +49,9 @@ import org.jtaccuino.gog.theme.Theme;
 
 /**
  * A reusable plot card: a title header, a chip row of tags, the rendered plot,
- * an optional render-timing footer, the description, and a {@link SourceDrawer}
- * docked along the card's bottom border. Clicking a tag chip invokes the
+ * an optional render-timing footer, the description, the dataset attribution,
+ * and a {@link SourceDrawer} docked along the card's bottom border. Clicking a
+ * tag chip invokes the
  * {@link #setOnTagSelected} callback. The plot is built lazily off the JavaFX
  * application thread from a {@link PlotSpec} factory, so filtering and
  * scrolling stay responsive; a loading indicator is shown until the plot is
@@ -63,6 +64,7 @@ public class PlotCard extends StackPane {
     private final Label titleLabel = new Label();
     private final FlowPane tagsRow = new FlowPane(6, 4);
     private final Label descriptionLabel = new Label();
+    private final Label attributionLabel = new Label();
     private final Label failureLabel = new Label();
     private final Label timingCaption = new Label("Rendered in:");
     private final Label timingLabel = new Label();
@@ -148,6 +150,10 @@ public class PlotCard extends StackPane {
         descriptionLabel.getStyleClass().add("sampler-card-description");
         descriptionLabel.setManaged(false);
 
+        attributionLabel.setWrapText(true);
+        attributionLabel.getStyleClass().add("sampler-card-attribution");
+        attributionLabel.setManaged(false);
+
         failureLabel.setWrapText(true);
         failureLabel.getStyleClass().add("sampler-card-failure");
         failureLabel.setMaxWidth(Double.MAX_VALUE);
@@ -179,14 +185,15 @@ public class PlotCard extends StackPane {
         var footer = new HBox(12, timingRow);
         footer.setAlignment(Pos.BASELINE_LEFT);
 
-        // The card body: title, tag chips, plot, render timing, description.
-        // A reserved band at the bottom keeps the last description line clear
-        // of the collapsed source-drawer handle bar.
+        // The card body: title, tag chips, plot, render timing, description,
+        // dataset attribution. A reserved band at the bottom keeps the last
+        // line clear of the collapsed source-drawer handle bar.
         var content = new VBox(8);
         content.setPadding(new Insets(14, 14, 36, 14));
         // Child order: 0 title, 1 tag chips, 2 plot pane, 3 render timing,
-        // 4 description.
-        content.getChildren().addAll(titleLabel, tagsRow, plotPane, footer, descriptionLabel);
+        // 4 description, 5 dataset attribution.
+        content.getChildren().addAll(titleLabel, tagsRow, plotPane, footer, descriptionLabel,
+                attributionLabel);
 
         // The source drawer docks to the card's bottom border: it overlays the
         // content column and, when opened, slides its code panel up over the
@@ -383,6 +390,8 @@ public class PlotCard extends StackPane {
             tagsRow.getChildren().clear();
             descriptionLabel.setText("");
             descriptionLabel.setManaged(false);
+            attributionLabel.setText("");
+            attributionLabel.setManaged(false);
             sourceDrawer.setSource(null, null);
             return;
         }
@@ -391,6 +400,8 @@ public class PlotCard extends StackPane {
         titleLabel.setText(spec.title());
         descriptionLabel.setText(spec.description());
         descriptionLabel.setManaged(spec.description() != null && !spec.description().isBlank());
+        attributionLabel.setText(String.join("\n", spec.attribution()));
+        attributionLabel.setManaged(!spec.attribution().isEmpty());
         tagsRow.getChildren().setAll(spec.tags().stream().map(this::tagChip).toList());
         sourceDrawer.setSource(spec.methodName(), spec.source());
 

@@ -48,6 +48,10 @@ import javax.tools.StandardLocation;
  * by the annotation, in fixed kind order
  * ({@code dataset,geom,stat,coord,scale,position,theme,guide,feature,facet}).
  * The runtime {@code Tags} facade builds {@code Tag}s from those ids.
+ * <p>
+ * Each entry also records an {@code attribution} key holding the encoded
+ * {@link DatasetAttribution} for the annotation's {@link SamplePlot#dataset()},
+ * so the sampler and builder can show the dataset's source and licence.
  */
 public class SampleRegistryProcessor extends AbstractProcessor {
 
@@ -145,6 +149,7 @@ public class SampleRegistryProcessor extends AbstractProcessor {
                 props.setProperty(key + "title", entry.plot.title());
                 props.setProperty(key + "description", entry.plot.description());
                 props.setProperty(key + "tags", entry.tagsString());
+                props.setProperty(key + "attribution", entry.plot.dataset().attribution().encode());
                 var source = sourceFor(entry);
                 props.setProperty(key + "source", Base64.getEncoder()
                         .encodeToString(source.getBytes(StandardCharsets.UTF_8)));

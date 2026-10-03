@@ -307,5 +307,28 @@ Licensed under the [Apache License, Version 2.0](LICENSE).
 - **Apache Commons Math**: [Apache License 2.0](https://commons.apache.org/proper/commons-math/)
 
 ### Example Datasets
-- **Human height GWAS** (`examples/gwas`): derived from Yengo *et al.*, *Nature* **610**, 704–712 (2022), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Summary statistics courtesy of the [GIANT consortium](https://portals.broadinstitute.org/collaboration/giant/index.php/GIANT_consortium_data_files). See [the dataset README](gog4j-data/src/main/resources/examples/gwas/README.md) for provenance and preprocessing.
-- **Seattle hourly weather** (`examples/seattle-weather`): a year of hourly normals (8,759 rows) exercising timestamp axes, derived from the NOAA/NWS Seattle climate normals, a U.S. Government work in the public domain.
+
+| Dataset | Rows | Upstream source | Licence |
+|---|---|---|---|
+| `diamonds` | 53,940 | [ggplot2](https://ggplot2.tidyverse.org/reference/diamonds.html) (R) | MIT |
+| `mpg` | 234 | [ggplot2](https://ggplot2.tidyverse.org/reference/mpg.html) (R) / US EPA | MIT |
+| `tips` | 244 | [reshape2](https://github.com/hadley/reshape) (R) | MIT |
+| `faithful` | 272 | [R datasets](https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/faithful.html) | GPL-2.0-only |
+| `faithfuld` | 5,625 | derived kernel density estimate of `faithful` | GPL-2.0-only |
+| `mtcars` | 32 | [R datasets](https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/mtcars.html) | GPL-2.0-only |
+| `penguins` | 344 | [palmerpenguins](https://allisonhorst.github.io/palmerpenguins/) (R) | CC0-1.0 |
+| `gwas` | 467,159 / 12,111 | [GIANT consortium / Yengo *et al.* (2022)](https://doi.org/10.1038/s41586-022-05275-y) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
+| `meat` | 960 | [USDA ERS Livestock & Meat Domestic Data](https://www.ers.usda.gov/data-products/livestock-and-meat-domestic-data) | Public domain |
+| `seattle-weather` | 8,759 | [NOAA/NWS](https://github.com/vega/vega-datasets) via vega-datasets | Public domain |
+| `anscombe` | 44 | Anscombe (1973), encoded inline | Public domain |
+| `polar` | derived | aggregated from `mtcars` and `diamonds` | Mixed (GPL-2.0-only / MIT) |
+
+The project-generated `mountain`, `sphere` and `synthetic` frames are covered
+by the project licence. The full citation, licence and derivation note for
+every dataset is recorded in [NOTICE](NOTICE) and in the machine-readable
+`META-INF/gog4j/datasets.properties` shipped with the `gog4j-data` jar; the
+sampler and builder display the same details in the app. The `mtcars` and
+`faithful` files come from R's `datasets` package (GPL-2.0-only) and are
+included as stand-alone aggregated data files — see [NOTICE](NOTICE) and
+`examples/GPL-2.0-only.txt`.
+

@@ -31,7 +31,24 @@ import java.util.function.Supplier;
  * @param factory     builds the figure to render
  * @param tags        display tags (labels only)
  * @param source      the Java source shown in the source drawer
+ * @param attribution dataset source/licence lines shown under the description
  */
 public record PlotSpec(String title, String description, String methodName,
-        Supplier<Object> factory, List<String> tags, String source) {
+        Supplier<Object> factory, List<String> tags, String source,
+        List<String> attribution) {
+
+    /**
+     * Builds a spec without dataset attribution.
+     *
+     * @param title       the display title
+     * @param description the optional description line
+     * @param methodName  the factory method name
+     * @param factory     builds the figure to render
+     * @param tags        display tags (labels only)
+     * @param source      the Java source shown in the source drawer
+     */
+    public PlotSpec(String title, String description, String methodName,
+            Supplier<Object> factory, List<String> tags, String source) {
+        this(title, description, methodName, factory, tags, source, List.of());
+    }
 }

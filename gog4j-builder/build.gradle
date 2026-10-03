@@ -12,6 +12,8 @@ dependencies {
     api project(':gog4j-controls')
     implementation project(':gog4j-dflib-data')
     implementation project(':gog4j-dflib')
+    // The dataset provenance registry lives in :gog4j-sampler-annotations.
+    implementation project(':gog4j-sampler-annotations')
     javafx "org.openjfx:javafx-base:${javafxVersion}:${javaFxPlatform}"
     javafx "org.openjfx:javafx-graphics:${javafxVersion}:${javaFxPlatform}"
     javafx "org.openjfx:javafx-controls:${javafxVersion}:${javaFxPlatform}"

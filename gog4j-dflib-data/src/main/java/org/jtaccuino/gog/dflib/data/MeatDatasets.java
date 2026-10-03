@@ -27,6 +27,10 @@ import org.dflib.csv.Csv;
 /**
  * Data loading and transformation utilities for the USDA meat production dataset.
  * <p>
+ * The data is published by the USDA Economic Research Service as a US
+ * Government work in the public domain. Provenance and licence are recorded in
+ * {@code META-INF/gog4j/datasets.properties} and the repository {@code NOTICE}.
+ * <p>
  * Provides long-format, consumption-per-year, and heatmap aggregations.
  */
 public class MeatDatasets {

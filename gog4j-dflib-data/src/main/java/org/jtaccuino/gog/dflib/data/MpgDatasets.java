@@ -21,6 +21,10 @@ import org.dflib.csv.Csv;
 /**
  * Data loading for the fuel-economy (mpg) dataset.
  * <p>
+ * The data comes from the ggplot2 R package (MIT licence). Provenance and
+ * licence are recorded in {@code META-INF/gog4j/datasets.properties} and the
+ * repository {@code NOTICE}.
+ * <p>
  * Provides a {@link #loadMpg()} method that returns the raw DataFrame.
  */
 public class MpgDatasets {

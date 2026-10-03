@@ -21,6 +21,12 @@ import org.dflib.csv.Csv;
 /**
  * Data loading for the Old Faithful dataset (faithfuld).
  * <p>
+ * The eruptions data comes from R's base {@code datasets} package and is
+ * licensed under the GNU General Public License v2.0 (GPL-2.0-only); it is
+ * bundled as a stand-alone data file (mere aggregation), not linked with the
+ * project code. Provenance and licence are recorded in
+ * {@code META-INF/gog4j/datasets.properties} and the repository {@code NOTICE}.
+ * <p>
  * Provides a {@link #loadFaithfuld()} method that returns a DataFrame with
  * columns eruptions, waiting, and density.
  */

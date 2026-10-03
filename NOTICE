@@ -1,0 +1,126 @@
+gog4j
+Copyright 2026 JTaccuino project
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+It also bundles example datasets that are the work of others and are
+distributed under their own terms. Those datasets are stand-alone data files:
+they are aggregated with the distribution, are not linked with the gog4j code,
+and do not change the Apache-2.0 licence of the code. The authoritative,
+machine-readable record of the same information ships in
+gog4j-data/src/main/resources/META-INF/gog4j/datasets.properties and is kept in
+step with org.jtaccuino.gog.sampler.meta.SampleDataset by the build.
+
+================================================================================
+Example datasets
+================================================================================
+
+diamonds — ggplot2 (R)
+  Licence: MIT License
+  Sources: https://ggplot2.tidyverse.org/reference/diamonds.html
+  Attribution: H. Wickham, ggplot2: Elegant Graphics for Data Analysis.
+  Bundled file: examples/diamonds/diamonds.csv
+
+mpg — ggplot2 (R) — US EPA fuel economy data
+  Licence: MIT License
+  Sources: https://ggplot2.tidyverse.org/reference/mpg.html
+  Attribution: H. Wickham, ggplot2: Elegant Graphics for Data Analysis. Fuel
+    economy data originally collected by the US Environmental Protection Agency
+    (1999–2008).
+  Bundled file: examples/mpg/mpg.csv
+
+tips — reshape2 (R) — restaurant tips
+  Licence: MIT License
+  Sources: https://github.com/hadley/reshape
+  Attribution: P. G. Bryant & M. Smith (1995). Practical Data Analysis: Case
+    Studies in Business Statistics. Richard D. Irwin.
+  Bundled file: examples/tips/tips.csv
+
+faithful — R datasets — Old Faithful geyser
+  Licence: GNU General Public License v2.0 (GPL-2.0-only)
+  Sources: https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/faithful.html
+  Attribution: W. Härdle (1991). Smoothing Techniques with Implementation in S.
+    Springer. Eruption and waiting times of the Old Faithful geyser, Yellowstone
+    National Park.
+  Bundled files: examples/faithful/faithful.csv,
+    examples/faithfuld/faithfuld.csv (a 2-D kernel density estimate computed
+    from faithful.csv).
+  GPL-2.0 text: examples/GPL-2.0-only.txt
+  Notice: This file is distributed under the GNU General Public License v2.0 as
+    part of R's datasets package. It is included here as a stand-alone data file
+    (mere aggregation) and does not affect the Apache-2.0 licence of the gog4j
+    code.
+
+mtcars — R datasets — Motor Trend car road tests
+  Licence: GNU General Public License v2.0 (GPL-2.0-only)
+  Sources: https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/mtcars.html
+  Attribution: D. A. Henderson & P. F. Velleman (1981). Building multiple
+    regression models interactively. Biometrics 37, 391–411. Data extracted from
+    the 1974 Motor Trend US magazine.
+  Bundled file: examples/mtcars/mtcars.csv
+  GPL-2.0 text: examples/GPL-2.0-only.txt
+  Notice: This file is distributed under the GNU General Public License v2.0 as
+    part of R's datasets package. It is included here as a stand-alone data file
+    (mere aggregation) and does not affect the Apache-2.0 licence of the gog4j
+    code.
+
+penguins — palmerpenguins (R)
+  Licence: Creative Commons Zero v1.0 Universal (CC0-1.0)
+  Sources: https://allisonhorst.github.io/palmerpenguins/
+  Attribution: A. M. Horst, A. P. Hill & K. B. Gorman (2020). palmerpenguins:
+    Palmer Archipelago (Antarctica) penguin data. Data collected by K. B. Gorman
+    and the Palmer Station LTER.
+  Bundled file: examples/penguins/penguins.csv
+
+gwas — GIANT consortium human height GWAS
+  Licence: Creative Commons Attribution 4.0 (CC-BY-4.0)
+  Sources: https://doi.org/10.1038/s41586-022-05275-y
+  Attribution: L. Yengo, S. Vedantam, E. Marouli, J. Sidorenko, E. Bartell,
+    S. Sakaue, et al. (2022). A saturated map of common genetic variants
+    associated with human height. Nature 610, 704–712.
+  Note: the bundled files are a uniform 1-in-3 thinning of the summary
+    statistics plus the published lead SNPs; p-values are unchanged. See
+    examples/gwas/README.md for the full derivation.
+  Bundled files: examples/gwas/height_lead_snps.csv,
+    examples/gwas/height_gwas_thinned.csv.gz
+
+meat — USDA Economic Research Service — Livestock & Meat Domestic Data
+  Licence: Public domain (US Government work)
+  Sources: https://www.ers.usda.gov/data-products/livestock-and-meat-domestic-data
+  Attribution: U.S. Department of Agriculture, Economic Research Service.
+  Bundled file: examples/meat/meat.csv
+
+seattle-weather — NOAA/NWS Seattle climate normals (via vega-datasets)
+  Licence: Public domain (US Government work)
+  Sources: https://github.com/vega/vega-datasets
+  Attribution: National Oceanic and Atmospheric Administration / National
+    Weather Service hourly Seattle weather normals.
+  Bundled file: examples/seattle-weather/seattle-weather-hourly.csv
+
+anscombe — Anscombe's quartet (1973)
+  Licence: Public domain (factual data)
+  Sources: https://doi.org/10.1080/00031305.1973.10478966
+  Attribution: F. J. Anscombe (1973). Graphs in Statistical Analysis. The
+    American Statistician 27(1), 17–21.
+  Note: the four quartets are encoded inline in AnscombeDatasets.java.
+
+polar — Aggregated from mtcars (GPL-2.0-only) and diamonds (MIT)
+  Licence: Mixed: GPL-2.0-only (mtcars) and MIT (diamonds)
+  Note: cylinder counts are aggregated from mtcars; clarity/cut counts are
+    aggregated from diamonds at load time. The derived counts inherit the
+    licences of their sources.
+
+mountain — Generated mountain surface (gog4j)
+  Licence: Apache License 2.0
+  Note: sampled from a two-peak height function over [-3, 3]² in
+    MountainDatasets.java and covered by the project licence.
+
+sphere — Generated sphere point cloud (gog4j)
+  Licence: Apache License 2.0
+  Note: sampled on a latitude/longitude grid in SpherePointsDatasets.java and
+    covered by the project licence.
+
+synthetic — Synthetic frame generated in-code (gog4j)
+  Licence: Apache License 2.0
+  Note: built inline by the example factories and covered by the project
+    licence.

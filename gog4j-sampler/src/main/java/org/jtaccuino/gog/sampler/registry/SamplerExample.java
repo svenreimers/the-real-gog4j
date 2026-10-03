@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 import org.jtaccuino.gog.controls.PlotSpec;
+import org.jtaccuino.gog.sampler.meta.DatasetAttribution;
 
 /**
  * Metadata for one example plot in the sampler.
@@ -35,6 +36,8 @@ import org.jtaccuino.gog.controls.PlotSpec;
  * @param tags the tags attached to this example, the dataset tag first
  * @param source the Java source of the factory method, or an empty string if
  *     the source file could not be resolved
+ * @param attribution the provenance/licence of the example's dataset, never
+ *     {@code null}
  */
 public record SamplerExample(
         String title,
@@ -42,7 +45,8 @@ public record SamplerExample(
         String methodName,
         Supplier<Object> factory,
         List<Tag> tags,
-        String source) {
+        String source,
+        DatasetAttribution attribution) {
 
     /** Compact constructor rejecting null components. */
     public SamplerExample {
@@ -51,6 +55,22 @@ public record SamplerExample(
         Objects.requireNonNull(factory, "factory");
         tags = List.copyOf(tags);
         source = source == null ? "" : source;
+        attribution = attribution == null ? DatasetAttribution.none() : attribution;
+    }
+
+    /**
+     * Builds an example without dataset attribution.
+     *
+     * @param title the short display title
+     * @param description an optional one-line description
+     * @param methodName the factory method name
+     * @param factory supplier that builds a fresh plot
+     * @param tags the tags attached to the example
+     * @param source the Java source of the factory method
+     */
+    public SamplerExample(String title, String description, String methodName,
+            Supplier<Object> factory, List<Tag> tags, String source) {
+        this(title, description, methodName, factory, tags, source, DatasetAttribution.none());
     }
 
     /**
@@ -64,12 +84,14 @@ public record SamplerExample(
 
     /**
      * Adapts this example to the data-agnostic {@link PlotSpec} the reusable
-     * {@code PlotCard} control consumes, mapping the typed tags to plain labels.
+     * {@code PlotCard} control consumes, mapping the typed tags to plain labels
+     * and the dataset attribution to its display lines.
      *
      * @return a {@link PlotSpec} sharing this example's factory and source
      */
     public PlotSpec toSpec() {
         return new PlotSpec(title, description, methodName, factory,
-                tags.stream().map(Tag::label).toList(), source);
+                tags.stream().map(Tag::label).toList(), source,
+                attribution.displayLines());
     }
 }
